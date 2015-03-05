@@ -1,0 +1,211 @@
+<!--
+Copyright (c) 2014 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<!--
+`paper-toggle-button` provides a ON/OFF switch that user can toggle the state
+by tapping or by dragging the swtich.
+
+Example:
+
+    <paper-toggle-button></paper-toggle-button>
+
+Styling toggle button:
+
+To change the toggle color:
+
+    paper-toggle-button::shadow .toggle {
+      background-color: #9c27b0;
+    }
+
+To change the ink color:
+    
+    paper-toggle-button::shadow .toggle-ink {
+      color: #009688;
+    }
+
+To change the checked toggle color:
+
+    paper-toggle-button::shadow [checked] .toggle {
+      background-color: #4285f4;
+    }
+
+To change the checked ink color:
+
+    paper-toggle-button::shadow [checked] .toggle-ink {
+      color: #4285f4;
+    }
+
+To change the toggle bar and toggle button colors separately:
+
+    paper-toggle-button::shadow .toggle-bar {
+      background-color: #5677fc;
+    }
+
+    paper-toggle-button::shadow .toggle-button {
+      background-color: #9c27b0;
+    }
+
+@group Paper Elements
+@element paper-toggle-button
+@homepage github.io
+-->
+
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../polymer-gestures/polymer-gestures.html">
+<link rel="import" href="../x-elements/paper-ripple.html">
+<!-- <link rel="import" href="../core-a11y-keys/core-a11y-keys.html"> -->
+
+<link rel="stylesheet" href="paper-toggle-button.css">
+
+<template>
+
+  <!-- TODO(keanu): Port a11y keyboard shortcuts. -->
+  <!-- <core-a11y-keys target="{{}}" keys="space" on-keys-pressed="{{tap}}"></core-a11y-keys> -->
+  
+  <div id="toggleBar" class="toggle toggle-bar"></div>
+
+  <div id="toggleButton" class="toggle toggle-button">
+    <paper-ripple id="ink" class="toggle-ink circle"></paper-ripple>
+  </div>
+
+</template>
+
+<script>
+
+  Polymer({
+
+    tag: 'paper-toggle-button',
+    
+    /**
+     * Fired when the checked state changes due to user interaction.
+     *
+     * @event change
+     */
+     
+    /**
+     * Fired when the checked state changes.
+     *
+     * @event core-change
+     */
+
+    published: {
+      /**
+       * Gets or sets the state, `true` is checked and `false` is unchecked.
+       *
+       * @attribute checked
+       * @type boolean
+       * @default false
+       */
+      checked: Boolean,
+
+      /**
+       * If true, the toggle button is disabled.  A disabled toggle button cannot
+       * be tapped or dragged to change the checked state.
+       *
+       * @attribute disabled
+       * @type boolean
+       * @default false
+       */
+      disabled: Boolean
+    },
+
+    listeners: {
+      down: 'downAction',
+      up: 'upAction',
+      // TODO(keanu): change to tap once gestures are updated for Polymer 0.8.
+      click: 'tap',
+      // TODO(keanu): include once gestures are updated for Polymer 0.8.
+      // trackstart: 'trackStart',
+      // trackx: 'trackx',
+      // trackend: 'trackEnd'
+    },
+
+    bind: {
+      checked: 'checkedChanged',
+      disabled: 'disabledChanged'
+    },
+
+    downAction: function(e) {
+      if (this.disabled) {
+        return;
+      }
+      var rect = this.$.ink.getBoundingClientRect();
+      this.$.ink.downAction({
+        x: rect.left + rect.width / 2,
+        y: rect.top + rect.height / 2
+      });
+    },
+
+    upAction: function(e) {
+      if (this.disabled) {
+        return;
+      }
+      this.$.ink.upAction();
+    },
+
+    tap: function() {
+      if (this.disabled) {
+        return;
+      }
+      this.checked = !this.checked;
+      this.fire('change');
+    },
+
+    trackStart: function(e) {
+      if (this.disabled) {
+        return;
+      }
+      this._w = this.$.toggleBar.offsetWidth / 2;
+      e.preventTap();
+    },
+
+    trackx: function(e) {
+      this._x = Math.min(this._w, 
+          Math.max(0, this.checked ? this._w + e.dx : e.dx));
+      this.$.toggleButton.classList.add('dragging');
+      var s =  this.$.toggleButton.style;
+      s.webkitTransform = s.transform = 'translate3d(' + this._x + 'px,0,0)';
+    },
+
+    trackEnd: function() {
+      var s =  this.$.toggleButton.style;
+      s.transform = s.webkitTransform = '';
+      this.$.toggleButton.classList.remove('dragging');
+      var old = this.checked;
+      this.checked = Math.abs(this._x) > this._w / 2;
+      if (this.checked !== old) {
+        this.fire('change');
+      }
+    },
+    
+    checkedChanged: function(newVal, oldVal) {
+      // Update the checked attribute only if checkedChanged was not triggered
+      // by a change of the checked attribute.
+      if (this.checked && !this.hasAttribute('checked')) {
+        this.setAttribute('checked', '');
+      } else if (!this.checked && this.hasAttribute('checked')) {
+        this.removeAttribute('checked');
+      }
+      this.setAttribute('aria-pressed', Boolean(this.checked));
+      this.fire('core-change');
+    },
+
+    disabledChanged: function() {
+      // Update the disabled attribute only if disabledChanged was not triggered
+      // by a change of the disabled attribute.
+      if (this.disabled && !this.hasAttribute('disabled')) {
+        this.setAttribute('disabled', '');
+      } else if (!this.disabled && this.hasAttribute('disabled')) {
+        this.removeAttribute('disabled');
+      }
+    }
+
+  });
+
+</script>

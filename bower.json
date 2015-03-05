@@ -1,0 +1,16 @@
+{
+  "name": "designer",
+  "private": true,
+  "dependencies": {
+    "webcomponentsjs": "Polymer/webcomponentsjs#master",
+    "polymer": "Polymer/polymer#0.8-preview",
+    "paper-toggle-button": "Polymer/paper-toggle-button#0.8-preview",
+    "core-icons": "Polymer/core-icons#0.8-preview",
+    "core-image": "Polymer/core-image#0.8-preview",
+    "core-ajax": "Polymer/core-ajax#0.8-preview",
+    "core-toolbar": "Polymer/core-toolbar#0.8-preview"
+  },
+  "resolutions": {
+    "polymer": "0.8-preview"
+  }
+}
