@@ -1,13 +1,13 @@
 {
   "name": "layout",
-  "homepage": "https://github.com/polymer/layout",
-  "_release": "2e4f84b9c2",
+  "homepage": "https://github.com/Polymer/layout",
+  "_release": "32254231db",
   "_resolution": {
     "type": "branch",
     "branch": "master",
-    "commit": "2e4f84b9c22b7543b337589eea6461e922b8b50c"
+    "commit": "32254231db577739b2e1efb57194406c81894081"
   },
-  "_source": "git://github.com/polymer/layout.git",
+  "_source": "git://github.com/Polymer/layout.git",
   "_target": "*",
-  "_originalSource": "polymer/layout"
+  "_originalSource": "Polymer/layout"
 }
