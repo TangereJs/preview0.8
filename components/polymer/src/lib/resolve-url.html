@@ -9,7 +9,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 -->
 <script>
 
-  modulate('ResolveUrl', function() {
+  (function() {
 
     // path fixup for urls in cssText that's expected to 
     // come from a given ownerDocument
@@ -46,6 +46,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       return resolver.href;
     }
 
+    var tempDoc;
+    var tempDocBase;
+    function resolveUrl(url, baseUri) {
+      if (!tempDoc) {
+        tempDoc = document.implementation.createHTMLDocument('temp');
+        tempDocBase = tempDoc.createElement('base');
+        tempDoc.head.appendChild(tempDocBase);
+      }
+      tempDocBase.href = baseUri;
+      return resolve(url, tempDoc);
+    }
+
     function getUrlResolver(ownerDocument) {
       return ownerDocument.__urlResolver || 
         (ownerDocument.__urlResolver = ownerDocument.createElement('a'));
@@ -59,10 +71,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     var BINDING_RX = /\{\{|\[\[/;
 
     // exports
-    return {
+    Polymer.ResolveUrl = {
       resolveCss: resolveCss,
-      resolveAttrs: resolveAttrs
+      resolveAttrs: resolveAttrs,
+      resolveUrl: resolveUrl
     };
 
-  });
+  })();
+
 </script>

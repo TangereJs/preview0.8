@@ -9,97 +9,109 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 -->
 <script>
 
-  modulate('Base', function() {
+  Polymer.Base = {
 
-    var Base = {
+    // (semi-)pluggable features for Base
+    addFeature: function(feature) {
+      this.extend(this, feature);
+    },
 
-      telemetry: {
-        count: 0
-      },
+    registerCallback: function() {
+      this.registerFeatures();  // abstract
+      this.registered();
+    },
 
-      // (semi-)pluggable features for Base
-      addFeature: function(feature) {
-        this.extend(this, feature);
-      },
+    registered: function() {
+      // for overriding
+      // `this` context is a prototype, not an instance
+    },
 
-      registerCallback: function() {
-        this.registerFeatures();  // abstract
-        this.registered();
-      },
+    createdCallback: function() {
+      Polymer.telemetry.instanceCount++;
+      this.root = this;
+      this.beforeCreated();
+      this.created();
+      this.afterCreated();
+      this.initFeatures(); // abstract
+    },
 
-      registered: function() {
-        // for overriding
-        // `this` context is a prototype, not an instance
-      },
+    beforeCreated: function() {
+      // for overriding
+    },
 
-      createdCallback: function() {
-        Base.telemetry.count++;
-        this.root = this;
-        this.beforeCreated();
-        this.created();
-        this.afterCreated();
-        this.initFeatures(); // abstract
-      },
+    created: function() {
+      // for overriding
+    },
 
-      beforeCreated: function() {
-        // for overriding
-      },
+    afterCreated: function() {
+      // for overriding
+    },
 
-      created: function() {
-        // for overriding
-      },
+    attachedCallback: function() {
+      this.isAttached = true;
+      // reserved for canonical behavior
+      this.attached();
+    },
 
-      afterCreated: function() {
-        // for overriding
-      },
+    attached: function() {
+      // for overriding
+    },
 
-      attachedCallback: function() {
-        this.isAttached = true;
-        // reserved for canonical behavior
-        this.attached();
-      },
+    detachedCallback: function() {
+      this.isAttached = false;
+      // reserved for canonical behavior
+      this.detached();
+    },
 
-      attached: function() {
-        // for overriding
-      },
+    detached: function() {
+      // for overriding
+    },
 
-      detachedCallback: function() {
-        this.isAttached = false;
-        // reserved for canonical behavior
-        this.detached();
-      },
+    attributeChangedCallback: function(name) {
+      this.setAttributeToProperty(this, name);
+      // reserved for canonical behavior
+      this.attributeChanged.apply(this, arguments);
+    },
 
-      detached: function() {
-        // for overriding
-      },
+    attributeChanged: function() {
+      // for overriding
+    },
 
-      attributeChangedCallback: function(name) {
-        this.setAttributeToProperty(this, name);
-        // reserved for canonical behavior
-        this.attributeChanged.apply(this, arguments);
-      },
-
-      attributeChanged: function() {
-        // for overriding
-      },
-
-      // copy own properties from `api` to `prototype`
-      extend: function(prototype, api) {
-        if (prototype && api) {
-          Object.getOwnPropertyNames(api).forEach(function(n) {
-            var pd = Object.getOwnPropertyDescriptor(api, n);
-            if (pd) {
-              Object.defineProperty(prototype, n, pd);
-            }
-          });
-        }
-        return prototype || api;
+    // copy own properties from `api` to `prototype`
+    extend: function(prototype, api) {
+      if (prototype && api) {
+        Object.getOwnPropertyNames(api).forEach(function(n) {
+          var pd = Object.getOwnPropertyDescriptor(api, n);
+          if (pd) {
+            Object.defineProperty(prototype, n, pd);
+          }
+        });
       }
+      return prototype || api;
+    }
 
+  };
+
+  if (Object.__proto__) {
+    Polymer.Base.chainObject = function(object, inherited) {
+      if (object && inherited && object !== inherited) {
+        object.__proto__ = inherited;
+      }
+      return object;
     };
+  } else {
+    Polymer.Base.chainObject = function(object, inherited) {
+      if (object && inherited && object !== inherited) {
+        var chained = Object.create(inherited);
+        object = Polymer.Base.extend(chained, object);
+      }
+      return object;
+    };
+  }
 
-    return Base;
+  Polymer.Base = Polymer.Base.chainObject(Polymer.Base, HTMLElement.prototype);
 
-  });
+  // TODO(sjmiles): ad hoc telemetry
+  Polymer.telemetry.instanceCount = 0;
 
 </script>

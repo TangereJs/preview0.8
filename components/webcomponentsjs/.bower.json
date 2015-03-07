@@ -10,11 +10,11 @@
   ],
   "license": "BSD",
   "ignore": [],
-  "_release": "fb5eeb0998",
+  "_release": "b437b5c8fb",
   "_resolution": {
     "type": "branch",
     "branch": "master",
-    "commit": "fb5eeb09986e21885de701d06507dfa6c66b7e81"
+    "commit": "b437b5c8fb3032a9c7450b7a859e076c8d7d1f0f"
   },
   "_source": "git://github.com/Polymer/webcomponentsjs.git",
   "_target": "master",
